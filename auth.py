@@ -8,8 +8,8 @@ import urllib.parse
 app = Flask(__name__)
 app.secret_key = "random stuff?"
 
-client_id = os.getenv("clientID")
-client_secret = os.getenv("clientSecret")
+client_id = "172864bf1c9c486fa39955b6dafc90c0"
+client_secret = "1966d7082df54d74a5e7cbafca56b805"
 redirect_uri = "http://localhost:5000/callback"
 
 auth_url = "https://accounts.spotify.com/authorize"
@@ -80,7 +80,7 @@ def get_playlists():
     return jsonify(playlists) """
 
 @app.route('/get_songs')
-def generate_playlist():
+def get_songs(): #param = valence
     #check for missing token
     if 'access_token' not in session:
         return redirect('/login')
@@ -100,9 +100,18 @@ def generate_playlist():
     query_url = api_base_url + 'recommendations' + query
 
     response = requests.get(query_url, headers=headers)
-    songs = response.json()
+    
+    session['songs'] = response['tracks']
 
-    return jsonify(songs)
+    return redirect('/make_playlist')
+
+@app.route('/make_playlist')
+def make_playlist(): #params = name of book
+    testName = "slayidk"
+    req_body = {
+        "name": testName,
+        "description": f"The perfect soundtrack for reading {testName}, courtesy of Orpheus."
+    }
 
 
 @app.route('/refresh-token')
